@@ -1,4 +1,4 @@
-# PROYECTO BASE: [Guía 10 - Introducción a la manipulación del DOM] - Software Factory SENA
+# PROYECTO BASE: [Proyecto Backend] - Software Factory SENA
 
 **Metodología:** *"Del Requerimiento al Producto"*
 
