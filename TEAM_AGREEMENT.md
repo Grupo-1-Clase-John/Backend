@@ -6,7 +6,7 @@ Este documento establece las reglas de convivencia, comunicación y estándares 
 | Nombre | Rol | Usuario de GitHub |
 | :--- | :--- | :--- |
 | [Miguel Flórez] | Líder (Arquitecto) | `@MiguelFlVe` |
-| [] |  | `` |
+| [Oscar Solano]  | Desarrollador (Backend) | `@OscarSolano97` |
 | [] |  | `` |
 
 ## 2. Canales de Comunicación
