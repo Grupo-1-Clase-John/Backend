@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "userId": 6,
+    "title": "Revisar correo de wsp",
+    "description": "Organizar bandeja de entrada y responder mensajes",
+    "status": "en-proceso",
+    "createdAt": "2026-05-10T09:00:00Z"
+  },
+  {
+    "id": "2",
+    "userId": 5,
+    "title": "Preparar presentación",
+    "description": "Crear diapositivas para la reunión del viernes",
+    "status": "pendiente",
+    "createdAt": "2026-05-11T14:30:00Z"
+  },
+  {
+    "id": "3",
+    "userId": 9,
+    "title": "Actualizar el css",
+    "description": "darle una metodologss y script",
+    "status": "completada",
+    "createdAt": "2026-05-09T10:00:00Z"
+  },
+  {
+    "id": "5",
+    "userId": 4,
+    "title": "Enviar informe mensual",
+    "description": "Compilar datos y enviar al jefe de área",
+    "status": "completada",
+    "createdAt": "2026-05-08T16:00:00Z"
+  },
+  {
+    "id": "1783198349446",
+    "userId": 11,
+    "title": "comprar",
+    "description": "comprar una casa",
+    "status": "completada",
+    "createdAt": "2026-07-04T20:52:29.895Z"
+  }
+]
