@@ -10,3 +10,7 @@ usersRoutes.post('/', createUser);
 usersRoutes.patch('/:id', updateUser);
 usersRoutes.delete('/:id', deleteUser);
 usersRoutes.get('/:userId/tasks', getTasksByUser);
+
+
+// # Listar usuarios	http://localhost:3000/users
+// # Usuario por ID	http://localhost:3000/users/1

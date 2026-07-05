@@ -1,7 +1,7 @@
 [
   {
     "id": "1",
-    "userId": 6,
+    "userId": "6",
     "title": "Revisar correo de wsp",
     "description": "Organizar bandeja de entrada y responder mensajes",
     "status": "en-proceso",
@@ -9,7 +9,7 @@
   },
   {
     "id": "2",
-    "userId": 5,
+    "userId": "5",
     "title": "Preparar presentación",
     "description": "Crear diapositivas para la reunión del viernes",
     "status": "pendiente",
@@ -17,34 +17,57 @@
   },
   {
     "id": "3",
-    "userId": 9,
+    "userId": "9",
     "title": "Actualizar el css",
     "description": "darle una metodologss y script",
     "status": "completada",
     "createdAt": "2026-05-09T10:00:00Z"
   },
   {
-    "id": "5",
-    "userId": 4,
+    "id": "4",
+    "userId": "4",
     "title": "Enviar informe mensual",
     "description": "Compilar datos y enviar al jefe de área",
     "status": "completada",
     "createdAt": "2026-05-08T16:00:00Z"
   },
   {
-    "id": "1783198349446",
-    "userId": 11,
+    "id": "5",
+    "userId": "11",
     "title": "comprar",
     "description": "comprar una casa",
     "status": "completada",
     "createdAt": "2026-07-04T20:52:29.895Z"
   },
   {
-    "id": "1783222232202",
-    "userId": 2,
+    "id": "6",
+    "userId": "2",
     "title": "fffffff",
     "description": "ddddddddd",
     "status": "pendiente",
     "createdAt": "2026-07-05T03:30:32.574Z"
+  },
+  {
+    "id": "7",
+    "userId": "1",
+    "title": "Test",
+    "description": "test",
+    "status": "pendiente",
+    "createdAt": "2026-07-05T19:02:51.384Z"
+  },
+  {
+    "userId": "3",
+    "title": "Nueva tarea",
+    "id": "8",
+    "status": "pendiente",
+    "createdAt": "2026-07-05T19:28:58.838Z"
+  },
+  {
+    "id": "9",
+    "userId": "6",
+    "title": "ponerse",
+    "description": "los zapatos",
+    "status": "completada",
+    "createdAt": "2026-07-05T19:29:49.347Z"
   }
 ]

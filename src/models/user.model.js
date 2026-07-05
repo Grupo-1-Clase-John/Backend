@@ -21,12 +21,14 @@ const writeUsers = (users) => {
 export const getUsers = () => readUsers();
 
 export const getUserById = (id) => {
-  return readUsers().find(u => u.id === id) || null;
+  return readUsers().find(u => String(u.id) === String(id)) || null;
 };
 
 export const createUser = (data) => {
   const users = readUsers();
-  const newUser = { id: String(users.length + 1), ...data };
+  const newId = String(data.id || Date.now());
+  if (users.find(u => String(u.id) === newId)) return null;
+  const newUser = { ...data, id: newId };
   users.push(newUser);
   writeUsers(users);
   return newUser;
@@ -34,16 +36,16 @@ export const createUser = (data) => {
 
 export const updateUser = (id, data) => {
   const users = readUsers();
-  const index = users.findIndex(u => u.id === id);
+  const index = users.findIndex(u => String(u.id) === String(id));
   if (index === -1) return null;
-  users[index] = { ...users[index], ...data };
+  users[index] = { ...users[index], ...data, id: users[index].id };
   writeUsers(users);
   return users[index];
 };
 
 export const deleteUser = (id) => {
   const users = readUsers();
-  const index = users.findIndex(u => u.id === id);
+  const index = users.findIndex(u => String(u.id) === String(id));
   if (index === -1) return false;
   users.splice(index, 1);
   writeUsers(users);
