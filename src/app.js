@@ -23,6 +23,11 @@ app.get('/', (req, res) => {
 app.use('/tasks', tasksRoutes);
 app.use('/users', usersRoutes);
 
+app.use((err, req, res, next) => {
+  console.error('Error:', err.message);
+  res.status(500).json({ message: 'Error interno del servidor' });
+});
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
