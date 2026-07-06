@@ -117,5 +117,17 @@
     "status": "pendiente",
     "createdAt": "2026-07-06T20:59:04.017Z",
     "id": "11"
+  },
+  {
+    "userIds": [
+      "9",
+      "11",
+      "12"
+    ],
+    "title": "ffdfdfdfd",
+    "description": "dffdfdfdfd",
+    "status": "en-proceso",
+    "createdAt": "2026-07-06T21:27:36.049Z",
+    "id": "12"
   }
 ]
