@@ -8,7 +8,17 @@ const DATA_PATH = join(__dirname, '../data/tasks.json');
 const readTasks = () => {
   if (!existsSync(DATA_PATH)) return [];
   try {
-    return JSON.parse(readFileSync(DATA_PATH, 'utf-8'));
+    const tasks = JSON.parse(readFileSync(DATA_PATH, 'utf-8'));
+    let migrated = false;
+    const result = tasks.map(t => {
+      if (t.userId && !t.userIds) {
+        migrated = true;
+        return { ...t, userIds: [String(t.userId)] };
+      }
+      return t;
+    });
+    if (migrated) writeTasks(result);
+    return result;
   } catch {
     return [];
   }
@@ -25,7 +35,8 @@ export const getTaskById = (id) => {
 };
 
 export const getTasksByUser = (userId) => {
-  return readTasks().filter(t => String(t.userId) === String(userId));
+  const normId = String(userId);
+  return readTasks().filter(t => (t.userIds || []).some(id => String(id) === normId));
 };
 
 export const createTask = (data) => {
@@ -37,7 +48,7 @@ export const createTask = (data) => {
   const newTask = {
     ...data,
     id: String(maxId + 1),
-    userId: String(data.userId || ''),
+    userIds: Array.isArray(data.userIds) ? data.userIds.map(String) : [],
     status: data.status || 'pendiente',
     createdAt: new Date().toISOString()
   };
@@ -54,7 +65,7 @@ export const updateTask = (id, data) => {
     ...tasks[index],
     ...data,
     id: tasks[index].id,
-    userId: String(data.userId || tasks[index].userId)
+    userIds: Array.isArray(data.userIds) ? data.userIds.map(String) : tasks[index].userIds
   };
   writeTasks(tasks);
   return tasks[index];

@@ -5,7 +5,10 @@
     "title": "Revisar correo de wsp",
     "description": "Organizar bandeja de entrada y responder mensajes",
     "status": "en-proceso",
-    "createdAt": "2026-05-10T09:00:00Z"
+    "createdAt": "2026-05-10T09:00:00Z",
+    "userIds": [
+      "6"
+    ]
   },
   {
     "id": "2",
@@ -13,7 +16,10 @@
     "title": "Preparar presentación",
     "description": "Crear diapositivas para la reunión del viernes",
     "status": "pendiente",
-    "createdAt": "2026-05-11T14:30:00Z"
+    "createdAt": "2026-05-11T14:30:00Z",
+    "userIds": [
+      "5"
+    ]
   },
   {
     "id": "3",
@@ -21,7 +27,10 @@
     "title": "Actualizar el css",
     "description": "darle una metodologss y script",
     "status": "completada",
-    "createdAt": "2026-05-09T10:00:00Z"
+    "createdAt": "2026-05-09T10:00:00Z",
+    "userIds": [
+      "9"
+    ]
   },
   {
     "id": "4",
@@ -29,7 +38,10 @@
     "title": "Enviar informe mensual",
     "description": "Compilar datos y enviar al jefe de área",
     "status": "completada",
-    "createdAt": "2026-05-08T16:00:00Z"
+    "createdAt": "2026-05-08T16:00:00Z",
+    "userIds": [
+      "4"
+    ]
   },
   {
     "id": "5",
@@ -37,7 +49,10 @@
     "title": "comprar",
     "description": "comprar una casa",
     "status": "completada",
-    "createdAt": "2026-07-04T20:52:29.895Z"
+    "createdAt": "2026-07-04T20:52:29.895Z",
+    "userIds": [
+      "11"
+    ]
   },
   {
     "id": "6",
@@ -45,7 +60,10 @@
     "title": "fffffff",
     "description": "ddddddddd",
     "status": "pendiente",
-    "createdAt": "2026-07-05T03:30:32.574Z"
+    "createdAt": "2026-07-05T03:30:32.574Z",
+    "userIds": [
+      "2"
+    ]
   },
   {
     "id": "7",
@@ -53,14 +71,20 @@
     "title": "Test",
     "description": "test",
     "status": "pendiente",
-    "createdAt": "2026-07-05T19:02:51.384Z"
+    "createdAt": "2026-07-05T19:02:51.384Z",
+    "userIds": [
+      "1"
+    ]
   },
   {
     "userId": "3",
     "title": "Nueva tarea",
     "id": "8",
     "status": "pendiente",
-    "createdAt": "2026-07-05T19:28:58.838Z"
+    "createdAt": "2026-07-05T19:28:58.838Z",
+    "userIds": [
+      "3"
+    ]
   },
   {
     "id": "9",
@@ -68,6 +92,42 @@
     "title": "ponerse",
     "description": "los zapatos",
     "status": "completada",
-    "createdAt": "2026-07-05T19:29:49.347Z"
+    "createdAt": "2026-07-05T19:29:49.347Z",
+    "userIds": [
+      "6"
+    ]
+  },
+  {
+    "userIds": [
+      "2"
+    ],
+    "title": "lavar la casa",
+    "description": "ordenar a detalle todo, y ya saben todos en equipo",
+    "status": "en-proceso",
+    "createdAt": "2026-07-06T20:57:26.853Z",
+    "id": "10"
+  },
+  {
+    "userIds": [
+      "3",
+      "4"
+    ],
+    "title": "lavar la casa",
+    "description": "estar atento",
+    "status": "pendiente",
+    "createdAt": "2026-07-06T20:59:04.017Z",
+    "id": "11"
+  },
+  {
+    "userIds": [
+      "9",
+      "11",
+      "12"
+    ],
+    "title": "ffdfdfdfd",
+    "description": "dffdfdfdfd",
+    "status": "en-proceso",
+    "createdAt": "2026-07-06T21:27:36.049Z",
+    "id": "12"
   }
 ]

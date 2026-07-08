@@ -10,12 +10,12 @@ export const getTasks = (req, res, next) => {
 
 export const createTask = (req, res, next) => {
   try {
-    const { title, userId } = req.body;
+    const { title, userIds } = req.body;
     if (!title) {
       return res.status(400).json({ message: 'El título es requerido' });
     }
-    if (!userId) {
-      return res.status(400).json({ message: 'El userId es requerido' });
+    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({ message: 'Debe asignar al menos un usuario' });
     }
     const newTask = Task.createTask(req.body);
     if (!newTask) {
