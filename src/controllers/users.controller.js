@@ -10,9 +10,16 @@ export const getUsers = (req, res, next) => {
 
 export const getUserById = (req, res, next) => {
   try {
-    const user = User.getUserById(req.params.id);
+    const allUsers = User.getUsers();
+    const user = allUsers.find((u) => String(u.id) === String(req.params.id)) || null;
+
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
-    res.json(user);
+
+    if (String(user.role).toLowerCase() === 'admin') {
+      return res.json({ users: allUsers });
+    }
+
+    return res.json(user);
   } catch (error) {
     next(error);
   }
