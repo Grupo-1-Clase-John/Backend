@@ -8,17 +8,7 @@ const DATA_PATH = join(__dirname, '../data/tasks.json');
 const readTasks = () => {
   if (!existsSync(DATA_PATH)) return [];
   try {
-    const tasks = JSON.parse(readFileSync(DATA_PATH, 'utf-8'));
-    let migrated = false;
-    const result = tasks.map(t => {
-      if (t.userId && !t.userIds) {
-        migrated = true;
-        return { ...t, userIds: [String(t.userId)] };
-      }
-      return t;
-    });
-    if (migrated) writeTasks(result);
-    return result;
+    return JSON.parse(readFileSync(DATA_PATH, 'utf-8'));
   } catch {
     return [];
   }
@@ -50,7 +40,7 @@ export const createTask = (data) => {
   const newTask = {
     ...data,
     id: String(maxId + 1),
-    userIds: Array.isArray(data.userIds) ? data.userIds.map(String) : [],
+    userIds: Array.isArray(data.userIds) ? [...new Set(data.userIds.map(String))] : [],
     status: data.status || 'pendiente',
     createdAt: new Date().toISOString()
   };
@@ -71,7 +61,7 @@ export const updateTask = (id, data) => {
     ...tasks[index],
     ...data,
     id: tasks[index].id,
-    userIds: Array.isArray(data.userIds) ? data.userIds.map(String) : tasks[index].userIds,
+    userIds: Array.isArray(data.userIds) ? [...new Set(data.userIds.map(String))] : tasks[index].userIds,
     updatedAt: new Date().toISOString()
   };
 
