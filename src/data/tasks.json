@@ -120,5 +120,55 @@
     "status": "en-proceso",
     "createdAt": "2026-07-06T21:27:36.049Z",
     "id": "12"
+  },
+  {
+    "userIds": [
+      "1"
+    ],
+    "title": "232",
+    "description": "34343",
+    "status": "en-proceso",
+    "createdAt": "2026-07-23T06:29:38.587Z",
+    "id": "13"
+  },
+  {
+    "userIds": [
+      "2"
+    ],
+    "title": "sdsdsd",
+    "description": "dsdsddsd",
+    "status": "pendiente",
+    "createdAt": "2026-07-23T07:32:56.758Z",
+    "id": "14"
+  },
+  {
+    "userIds": [
+      "3"
+    ],
+    "title": "1",
+    "description": "22",
+    "status": "pendiente",
+    "createdAt": "2026-07-23T07:48:27.422Z",
+    "id": "15"
+  },
+  {
+    "userIds": [
+      "3"
+    ],
+    "title": "sdsd",
+    "description": "dsd",
+    "status": "completada",
+    "createdAt": "2026-07-23T07:48:44.294Z",
+    "id": "16"
+  },
+  {
+    "userIds": [
+      "4"
+    ],
+    "title": "3434",
+    "description": "343",
+    "status": "pendiente",
+    "createdAt": "2026-07-23T08:26:09.198Z",
+    "id": "17"
   }
 ]
