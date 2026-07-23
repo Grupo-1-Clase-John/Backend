@@ -34,9 +34,11 @@ export const getTaskById = (id) => {
   return readTasks().find(t => String(t.id) === String(id)) || null;
 };
 
-export const getTasksByUser = (userId) => {
+export const getTasksByUser = (userId, status) => {
   const normId = String(userId);
-  return readTasks().filter(t => (t.userIds || []).some(id => String(id) === normId));
+  const tasks = readTasks().filter(t => (t.userIds || []).some(id => String(id) === normId));
+  if (status) return tasks.filter(t => t.status === status);
+  return tasks;
 };
 
 export const createTask = (data) => {
@@ -61,12 +63,24 @@ export const updateTask = (id, data) => {
   const tasks = readTasks();
   const index = tasks.findIndex(t => String(t.id) === String(id));
   if (index === -1) return null;
+
+  const wasCompleted = tasks[index].status === 'completada';
+  const newStatus = data.status;
+
   tasks[index] = {
     ...tasks[index],
     ...data,
     id: tasks[index].id,
-    userIds: Array.isArray(data.userIds) ? data.userIds.map(String) : tasks[index].userIds
+    userIds: Array.isArray(data.userIds) ? data.userIds.map(String) : tasks[index].userIds,
+    updatedAt: new Date().toISOString()
   };
+
+  if (newStatus === 'completada') {
+    tasks[index].completedAt = new Date().toISOString();
+  } else if (newStatus && wasCompleted) {
+    tasks[index].completedAt = null;
+  }
+
   writeTasks(tasks);
   return tasks[index];
 };
