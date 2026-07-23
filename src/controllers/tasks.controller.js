@@ -28,8 +28,24 @@ export const createTask = (req, res, next) => {
   }
 };
 
+const VALID_STATUSES = ['pendiente', 'en-proceso', 'completada'];
+
 export const updateTask = (req, res, next) => {
   try {
+    const { status, userIds } = req.body;
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: 'Debe enviar al menos un campo para actualizar' });
+    }
+
+    if (status !== undefined && !VALID_STATUSES.includes(status)) {
+      return res.status(400).json({ message: `Estado inválido. Valores permitidos: ${VALID_STATUSES.join(', ')}` });
+    }
+
+    if (userIds !== undefined && !Array.isArray(userIds)) {
+      return res.status(400).json({ message: 'userIds debe ser un array' });
+    }
+
     const updated = Task.updateTask(req.params.id, req.body);
     if (!updated) return res.status(404).json({ message: 'Tarea no encontrada' });
     res.json(updated);
