@@ -34,9 +34,11 @@ export const getTaskById = (id) => {
   return readTasks().find(t => String(t.id) === String(id)) || null;
 };
 
-export const getTasksByUser = (userId) => {
+export const getTasksByUser = (userId, status) => {
   const normId = String(userId);
-  return readTasks().filter(t => (t.userIds || []).some(id => String(id) === normId));
+  const tasks = readTasks().filter(t => (t.userIds || []).some(id => String(id) === normId));
+  if (status) return tasks.filter(t => t.status === status);
+  return tasks;
 };
 
 export const createTask = (data) => {

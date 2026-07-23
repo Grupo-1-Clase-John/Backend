@@ -1,4 +1,5 @@
 import * as Task from '../models/task.model.js';
+import * as User from '../models/user.model.js';
 
 export const getTasks = (req, res, next) => {
   try {
@@ -59,8 +60,13 @@ export const deleteTask = (req, res, next) => {
 
 export const getTasksByUser = (req, res, next) => {
   try {
-    const userTasks = Task.getTasksByUser(req.params.userId);
-    res.json(userTasks);
+    const userId = req.params.userId;
+    const user = User.getUserById(userId);
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+
+    const status = req.query.status || null;
+    const tasks = Task.getTasksByUser(userId, status);
+    res.json({ user, tasks });
   } catch (error) {
     next(error);
   }

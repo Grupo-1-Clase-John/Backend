@@ -20,6 +20,10 @@ const writeUsers = (users) => {
 
 export const getUsers = () => readUsers();
 
+export const userExists = (id) => {
+  return readUsers().some(u => String(u.id) === String(id));
+};
+
 export const getUserById = (id) => {
   return readUsers().find(u => String(u.id) === String(id)) || null;
 };
