@@ -9,6 +9,16 @@ export const getTasks = (req, res, next) => {
   }
 };
 
+const validateUserIds = (userIds) => {
+  const allUsers = User.getUsers();
+  const validIds = allUsers.map(u => String(u.id));
+  const invalid = userIds.filter(id => !validIds.includes(String(id)));
+  if (invalid.length > 0) {
+    return `Los siguientes usuarios no existen: ${invalid.join(', ')}`;
+  }
+  return null;
+};
+
 export const createTask = (req, res, next) => {
   try {
     const { title, userIds } = req.body;
@@ -18,10 +28,9 @@ export const createTask = (req, res, next) => {
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
       return res.status(400).json({ message: 'Debe asignar al menos un usuario' });
     }
+    const error = validateUserIds(userIds);
+    if (error) return res.status(400).json({ message: error });
     const newTask = Task.createTask(req.body);
-    if (!newTask) {
-      return res.status(500).json({ message: 'Error al crear la tarea' });
-    }
     res.status(201).json(newTask);
   } catch (error) {
     next(error);
@@ -42,8 +51,15 @@ export const updateTask = (req, res, next) => {
       return res.status(400).json({ message: `Estado inválido. Valores permitidos: ${VALID_STATUSES.join(', ')}` });
     }
 
-    if (userIds !== undefined && !Array.isArray(userIds)) {
-      return res.status(400).json({ message: 'userIds debe ser un array' });
+    if (userIds !== undefined) {
+      if (!Array.isArray(userIds)) {
+        return res.status(400).json({ message: 'userIds debe ser un array' });
+      }
+      if (userIds.length === 0) {
+        return res.status(400).json({ message: 'Debe asignar al menos un usuario' });
+      }
+      const error = validateUserIds(userIds);
+      if (error) return res.status(400).json({ message: error });
     }
 
     const updated = Task.updateTask(req.params.id, req.body);
