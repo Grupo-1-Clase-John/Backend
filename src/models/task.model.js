@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { pool } from '../db.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = join(__dirname, '../data/tasks.json');
@@ -75,11 +76,12 @@ export const updateTask = (id, data) => {
   return tasks[index];
 };
 
-export const deleteTask = (id) => {
-  const tasks = readTasks();
-  const index = tasks.findIndex(t => String(t.id) === String(id));
-  if (index === -1) return false;
-  tasks.splice(index, 1);
-  writeTasks(tasks);
-  return true;
+export const deleteTask = async (id) => {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query('DELETE FROM tasks WHERE id = ?', [id]);
+    return result.affectedRows > 0;
+  } finally {
+    connection.release();
+  }
 };

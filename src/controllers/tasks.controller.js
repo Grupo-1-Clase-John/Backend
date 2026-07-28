@@ -80,9 +80,9 @@ export const getTaskById = (req, res, next) => {
   }
 };
 
-export const deleteTask = (req, res, next) => {
+export const deleteTask = async (req, res, next) => {
   try {
-    const deleted = Task.deleteTask(req.params.id);
+    const deleted = await Task.deleteTask(req.params.id);
     if (!deleted) return res.status(404).json({ message: 'Tarea no encontrada' });
     res.status(204).send();
   } catch (error) {
