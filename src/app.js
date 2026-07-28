@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { usersRoutes } from './routes/users.routes.js';
 import { tasksRoutes } from './routes/tasks.routes.js';
+import { databaseRoutes } from './routes/database.routes.js';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
 
 app.use('/tasks', tasksRoutes);
 app.use('/users', usersRoutes);
+app.use(databaseRoutes);
 
 app.use((err, req, res, next) => {
   console.error('Error:', err.message);
