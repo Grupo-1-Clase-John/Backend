@@ -9,7 +9,7 @@
   "scripts": {
     "start": "nodemon src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "migrate": "dotenv -e .env -- mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME < src/data/db.sql"
+    "migrate": "node src/migrate.js"
   },
   "repository": {
     "type": "git",
