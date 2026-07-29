@@ -19,7 +19,7 @@ const validateUserIds = (userIds) => {
   return null;
 };
 
-export const createTask = (req, res, next) => {
+export const createTask = async (req, res, next) => {
   try {
     const { title, userIds } = req.body;
     if (!title) {
@@ -30,7 +30,7 @@ export const createTask = (req, res, next) => {
     }
     const error = validateUserIds(userIds);
     if (error) return res.status(400).json({ message: error });
-    const newTask = Task.createTask(req.body);
+    const newTask = await Task.createTask(req.body);
     res.status(201).json(newTask);
   } catch (error) {
     next(error);

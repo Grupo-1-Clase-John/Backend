@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { pool } from '../db.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = join(__dirname, '../data/tasks.json');
@@ -31,22 +32,42 @@ export const getTasksByUser = (userId, status) => {
   return tasks;
 };
 
-export const createTask = (data) => {
-  const tasks = readTasks();
-  const maxId = tasks.reduce((max, t) => {
-    const num = parseInt(t.id, 10);
-    return num > max ? num : max;
-  }, 0);
-  const newTask = {
-    ...data,
-    id: String(maxId + 1),
-    userIds: Array.isArray(data.userIds) ? [...new Set(data.userIds.map(String))] : [],
-    status: data.status || 'pendiente',
-    createdAt: new Date().toISOString()
-  };
-  tasks.push(newTask);
-  writeTasks(tasks);
-  return newTask;
+export const createTask = async (data) => {
+  const { title, description, status = 'pendiente', userIds } = data;
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const [taskResult] = await connection.execute(
+      'INSERT INTO tasks (title, description, status) VALUES (?, ?, ?)',
+      [title, description || null, status]
+    );
+    const taskId = taskResult.insertId;
+
+    const uniqueUserIds = [...new Set((userIds || []).map(String))];
+    for (const userId of uniqueUserIds) {
+      await connection.execute(
+        'INSERT INTO task_assignments (task_id, user_id) VALUES (?, ?)',
+        [taskId, userId]
+      );
+    }
+
+    await connection.commit();
+
+    return {
+      id: String(taskId),
+      title,
+      description: description || null,
+      status,
+      userIds: uniqueUserIds,
+      
+    };
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 };
 
 export const updateTask = (id, data) => {
