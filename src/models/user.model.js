@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { pool } from '../db.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = join(__dirname, '../data/users.json');
@@ -47,11 +48,12 @@ export const updateUser = (id, data) => {
   return users[index];
 };
 
-export const deleteUser = (id) => {
-  const users = readUsers();
-  const index = users.findIndex(u => String(u.id) === String(id));
-  if (index === -1) return false;
-  users.splice(index, 1);
-  writeUsers(users);
-  return true;
+export const deleteUser = async (id) => {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query('DELETE FROM users WHERE id = ?', [id]);
+    return result.affectedRows > 0;
+  } finally {
+    connection.release();
+  }
 };
