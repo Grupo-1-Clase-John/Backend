@@ -25,16 +25,13 @@ export const getUserById = (req, res, next) => {
   }
 };
 
-export const createUser = (req, res, next) => {
+export const createUser = async (req, res, next) => {
   try {
     const { name, email } = req.body;
     if (!name || !email) {
       return res.status(400).json({ message: 'Nombre y email son requeridos' });
     }
-    const newUser = User.createUser(req.body);
-    if (!newUser) {
-      return res.status(409).json({ message: 'El documento de identidad ya existe' });
-    }
+    const newUser = await User.createUser(req.body);
     res.status(201).json(newUser);
   } catch (error) {
     next(error);

@@ -29,14 +29,13 @@ export const getUserById = (id) => {
   return readUsers().find(u => String(u.id) === String(id)) || null;
 };
 
-export const createUser = (data) => {
-  const users = readUsers();
-  const newId = String(data.id || Date.now());
-  if (users.find(u => String(u.id) === newId)) return null;
-  const newUser = { ...data, id: newId };
-  users.push(newUser);
-  writeUsers(users);
-  return newUser;
+export const createUser = async (data) => {
+  const { name, email, role = 'user' } = data;
+  const [result] = await pool.execute(
+    'INSERT INTO users (name, email, role) VALUES (?, ?, ?)',
+    [name, email, role]
+  );
+  return { id: String(result.insertId), name, email, role };
 };
 
 export const updateUser = (id, data) => {
