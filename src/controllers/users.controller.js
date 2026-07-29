@@ -1,16 +1,16 @@
 import * as User from '../models/user.model.js';
 
-export const getUsers = (req, res, next) => {
+export const getUsers = async (req, res, next) => {
   try {
-    res.json({ users: User.getUsers() });
+    res.json({ users: await User.getUsers() });
   } catch (error) {
     next(error);
   }
 };
 
-export const getUserById = (req, res, next) => {
+export const getUserById = async (req, res, next) => {
   try {
-    const allUsers = User.getUsers();
+    const allUsers = await User.getUsers();
     const user = allUsers.find((u) => String(u.id) === String(req.params.id)) || null;
 
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
@@ -41,9 +41,12 @@ export const createUser = (req, res, next) => {
   }
 };
 
-export const updateUser = (req, res, next) => {
+export const updateUser = async (req, res, next) => {
   try {
-    const updated = User.updateUser(req.params.id, req.body);
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: 'Debe enviar al menos un campo para actualizar' });
+    }
+    const updated = await User.updateUser(req.params.id, req.body);
     if (!updated) return res.status(404).json({ message: 'Usuario no encontrado' });
     res.json(updated);
   } catch (error) {

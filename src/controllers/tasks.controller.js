@@ -1,16 +1,16 @@
 import * as Task from '../models/task.model.js';
 import * as User from '../models/user.model.js';
 
-export const getTasks = (req, res, next) => {
+export const getTasks = async (req, res, next) => {
   try {
-    res.json({ tasks: Task.getTasks() });
+    res.json({ tasks: await Task.getTasks() });
   } catch (error) {
     next(error);
   }
 };
 
-const validateUserIds = (userIds) => {
-  const allUsers = User.getUsers();
+const validateUserIds = async (userIds) => {
+  const allUsers = await User.getUsers();
   const validIds = allUsers.map(u => String(u.id));
   const invalid = userIds.filter(id => !validIds.includes(String(id)));
   if (invalid.length > 0) {
@@ -19,7 +19,7 @@ const validateUserIds = (userIds) => {
   return null;
 };
 
-export const createTask = (req, res, next) => {
+export const createTask = async (req, res, next) => {
   try {
     const { title, userIds } = req.body;
     if (!title) {
@@ -28,7 +28,7 @@ export const createTask = (req, res, next) => {
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
       return res.status(400).json({ message: 'Debe asignar al menos un usuario' });
     }
-    const error = validateUserIds(userIds);
+    const error = await validateUserIds(userIds);
     if (error) return res.status(400).json({ message: error });
     const newTask = Task.createTask(req.body);
     res.status(201).json(newTask);
@@ -39,7 +39,7 @@ export const createTask = (req, res, next) => {
 
 const VALID_STATUSES = ['pendiente', 'en-proceso', 'completada'];
 
-export const updateTask = (req, res, next) => {
+export const updateTask = async (req, res, next) => {
   try {
     const { status, userIds } = req.body;
 
@@ -58,11 +58,11 @@ export const updateTask = (req, res, next) => {
       if (userIds.length === 0) {
         return res.status(400).json({ message: 'Debe asignar al menos un usuario' });
       }
-      const error = validateUserIds(userIds);
+      const error = await validateUserIds(userIds);
       if (error) return res.status(400).json({ message: error });
     }
 
-    const updated = Task.updateTask(req.params.id, req.body);
+    const updated = await Task.updateTask(req.params.id, req.body);
     if (!updated) return res.status(404).json({ message: 'Tarea no encontrada' });
     res.json(updated);
   } catch (error) {
@@ -70,9 +70,9 @@ export const updateTask = (req, res, next) => {
   }
 };
 
-export const getTaskById = (req, res, next) => {
+export const getTaskById = async (req, res, next) => {
   try {
-    const task = Task.getTaskById(req.params.id);
+    const task = await Task.getTaskById(req.params.id);
     if (!task) return res.status(404).json({ message: 'Tarea no encontrada' });
     res.json(task);
   } catch (error) {
@@ -90,14 +90,14 @@ export const deleteTask = (req, res, next) => {
   }
 };
 
-export const getTasksByUser = (req, res, next) => {
+export const getTasksByUser = async (req, res, next) => {
   try {
     const userId = req.params.userId;
-    const user = User.getUserById(userId);
+    const user = await User.getUserById(userId);
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
     const status = req.query.status || null;
-    const tasks = Task.getTasksByUser(userId, status);
+    const tasks = await Task.getTasksByUser(userId, status);
     res.json({ user, tasks });
   } catch (error) {
     next(error);
