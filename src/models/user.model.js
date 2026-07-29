@@ -19,14 +19,19 @@ const writeUsers = (users) => {
   writeFileSync(DATA_PATH, JSON.stringify(users, null, 2), 'utf-8');
 };
 
-export const getUsers = () => readUsers();
-
-export const userExists = (id) => {
-  return readUsers().some(u => String(u.id) === String(id));
+export const getUsers = async () => {
+  const [rows] = await pool.query('SELECT * FROM users');
+  return rows;
 };
 
-export const getUserById = (id) => {
-  return readUsers().find(u => String(u.id) === String(id)) || null;
+export const getUserById = async (id) => {
+  const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+  return rows[0] || null;
+};
+
+export const userExists = async (id) => {
+  const [rows] = await pool.query('SELECT COUNT(*) AS count FROM users WHERE id = ?', [id]);
+  return rows[0].count > 0;
 };
 
 export const createUser = async (data) => {
@@ -38,13 +43,31 @@ export const createUser = async (data) => {
   return { id: String(result.insertId), name, email, role };
 };
 
-export const updateUser = (id, data) => {
-  const users = readUsers();
-  const index = users.findIndex(u => String(u.id) === String(id));
-  if (index === -1) return null;
-  users[index] = { ...users[index], ...data, id: users[index].id };
-  writeUsers(users);
-  return users[index];
+export const updateUser = async (id, data) => {
+  const fields = [];
+  const values = [];
+
+  if (data.name !== undefined) {
+    fields.push('name = ?');
+    values.push(data.name);
+  }
+  if (data.email !== undefined) {
+    fields.push('email = ?');
+    values.push(data.email);
+  }
+  if (data.role !== undefined) {
+    fields.push('role = ?');
+    values.push(data.role);
+  }
+
+  if (fields.length === 0) return null;
+
+  values.push(id);
+  const [result] = await pool.query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, values);
+
+  if (result.affectedRows === 0) return null;
+
+  return getUserById(id);
 };
 
 export const deleteUser = async (id) => {

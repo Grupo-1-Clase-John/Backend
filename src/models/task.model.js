@@ -19,16 +19,33 @@ const writeTasks = (tasks) => {
   writeFileSync(DATA_PATH, JSON.stringify(tasks, null, 2), 'utf-8');
 };
 
-export const getTasks = () => readTasks();
+const mapTask = (row) => ({
+  ...row,
+  userIds: row.userIds ? row.userIds.split(',').map(String) : []
+});
 
-export const getTaskById = (id) => {
-  return readTasks().find(t => String(t.id) === String(id)) || null;
+export const getTasks = async () => {
+  const [rows] = await pool.query(
+    'SELECT t.*, GROUP_CONCAT(ta.user_id) AS userIds FROM tasks t LEFT JOIN task_assignments ta ON t.id = ta.task_id GROUP BY t.id'
+  );
+  return rows.map(mapTask);
 };
 
-export const getTasksByUser = (userId, status) => {
-  const normId = String(userId);
-  const tasks = readTasks().filter(t => (t.userIds || []).some(id => String(id) === normId));
-  if (status) return tasks.filter(t => t.status === status);
+export const getTaskById = async (id) => {
+  const [rows] = await pool.query(
+    'SELECT t.*, GROUP_CONCAT(ta.user_id) AS userIds FROM tasks t LEFT JOIN task_assignments ta ON t.id = ta.task_id WHERE t.id = ? GROUP BY t.id',
+    [id]
+  );
+  return rows[0] ? mapTask(rows[0]) : null;
+};
+
+export const getTasksByUser = async (userId, status) => {
+  const [rows] = await pool.query(
+    'SELECT t.*, GROUP_CONCAT(ta2.user_id) AS userIds FROM tasks t INNER JOIN task_assignments ta ON t.id = ta.task_id AND ta.user_id = ? LEFT JOIN task_assignments ta2 ON t.id = ta2.task_id GROUP BY t.id',
+    [userId]
+  );
+  let tasks = rows.map(mapTask);
+  if (status) tasks = tasks.filter(t => t.status === status);
   return tasks;
 };
 
@@ -70,30 +87,55 @@ export const createTask = async (data) => {
   }
 };
 
-export const updateTask = (id, data) => {
-  const tasks = readTasks();
-  const index = tasks.findIndex(t => String(t.id) === String(id));
-  if (index === -1) return null;
+export const updateTask = async (id, data) => {
+  const { userIds, ...taskFields } = data;
+  const fields = [];
+  const values = [];
 
-  const wasCompleted = tasks[index].status === 'completada';
-  const newStatus = data.status;
-
-  tasks[index] = {
-    ...tasks[index],
-    ...data,
-    id: tasks[index].id,
-    userIds: Array.isArray(data.userIds) ? [...new Set(data.userIds.map(String))] : tasks[index].userIds,
-    updatedAt: new Date().toISOString()
-  };
-
-  if (newStatus === 'completada') {
-    tasks[index].completedAt = new Date().toISOString();
-  } else if (newStatus && wasCompleted) {
-    tasks[index].completedAt = null;
+  if (taskFields.title !== undefined) {
+    fields.push('title = ?');
+    values.push(taskFields.title);
+  }
+  if (taskFields.description !== undefined) {
+    fields.push('description = ?');
+    values.push(taskFields.description);
+  }
+  if (taskFields.status !== undefined) {
+    fields.push('status = ?');
+    values.push(taskFields.status);
   }
 
-  writeTasks(tasks);
-  return tasks[index];
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    let taskExists = true;
+
+    if (fields.length > 0) {
+      values.push(id);
+      const [result] = await connection.query(`UPDATE tasks SET ${fields.join(', ')} WHERE id = ?`, values);
+      if (result.affectedRows === 0) taskExists = false;
+    }
+
+    if (userIds !== undefined) {
+      await connection.query('DELETE FROM task_assignments WHERE task_id = ?', [id]);
+      if (userIds.length > 0) {
+        const insertValues = userIds.map(userId => [id, userId]);
+        await connection.query('INSERT INTO task_assignments (task_id, user_id) VALUES ?', [insertValues]);
+      }
+    }
+
+    await connection.commit();
+
+    if (!taskExists) return null;
+
+    return getTaskById(id);
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 };
 
 export const deleteTask = async (id) => {
