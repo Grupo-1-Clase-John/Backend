@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { pool } from '../db.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_PATH = join(__dirname, '../data/users.json');
@@ -18,14 +19,19 @@ const writeUsers = (users) => {
   writeFileSync(DATA_PATH, JSON.stringify(users, null, 2), 'utf-8');
 };
 
-export const getUsers = () => readUsers();
-
-export const userExists = (id) => {
-  return readUsers().some(u => String(u.id) === String(id));
+export const getUsers = async () => {
+  const [rows] = await pool.query('SELECT * FROM users');
+  return rows;
 };
 
-export const getUserById = (id) => {
-  return readUsers().find(u => String(u.id) === String(id)) || null;
+export const getUserById = async (id) => {
+  const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+  return rows[0] || null;
+};
+
+export const userExists = async (id) => {
+  const [rows] = await pool.query('SELECT COUNT(*) AS count FROM users WHERE id = ?', [id]);
+  return rows[0].count > 0;
 };
 
 export const createUser = (data) => {
