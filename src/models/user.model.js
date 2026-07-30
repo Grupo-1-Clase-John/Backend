@@ -34,30 +34,48 @@ export const userExists = async (id) => {
   return rows[0].count > 0;
 };
 
-export const createUser = (data) => {
-  const users = readUsers();
-  const newId = String(data.id || Date.now());
-  if (users.find(u => String(u.id) === newId)) return null;
-  const newUser = { ...data, id: newId };
-  users.push(newUser);
-  writeUsers(users);
-  return newUser;
+export const createUser = async (data) => {
+  const { name, email, role = 'user' } = data;
+  const [result] = await pool.execute(
+    'INSERT INTO users (name, email, role) VALUES (?, ?, ?)',
+    [name, email, role]
+  );
+  return { id: String(result.insertId), name, email, role };
 };
 
-export const updateUser = (id, data) => {
-  const users = readUsers();
-  const index = users.findIndex(u => String(u.id) === String(id));
-  if (index === -1) return null;
-  users[index] = { ...users[index], ...data, id: users[index].id };
-  writeUsers(users);
-  return users[index];
+export const updateUser = async (id, data) => {
+  const fields = [];
+  const values = [];
+
+  if (data.name !== undefined) {
+    fields.push('name = ?');
+    values.push(data.name);
+  }
+  if (data.email !== undefined) {
+    fields.push('email = ?');
+    values.push(data.email);
+  }
+  if (data.role !== undefined) {
+    fields.push('role = ?');
+    values.push(data.role);
+  }
+
+  if (fields.length === 0) return null;
+
+  values.push(id);
+  const [result] = await pool.query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, values);
+
+  if (result.affectedRows === 0) return null;
+
+  return getUserById(id);
 };
 
-export const deleteUser = (id) => {
-  const users = readUsers();
-  const index = users.findIndex(u => String(u.id) === String(id));
-  if (index === -1) return false;
-  users.splice(index, 1);
-  writeUsers(users);
-  return true;
+export const deleteUser = async (id) => {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query('DELETE FROM users WHERE id = ?', [id]);
+    return result.affectedRows > 0;
+  } finally {
+    connection.release();
+  }
 };

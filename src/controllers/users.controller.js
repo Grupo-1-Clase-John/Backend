@@ -25,25 +25,25 @@ export const getUserById = async (req, res, next) => {
   }
 };
 
-export const createUser = (req, res, next) => {
+export const createUser = async (req, res, next) => {
   try {
     const { name, email } = req.body;
     if (!name || !email) {
       return res.status(400).json({ message: 'Nombre y email son requeridos' });
     }
-    const newUser = User.createUser(req.body);
-    if (!newUser) {
-      return res.status(409).json({ message: 'El documento de identidad ya existe' });
-    }
+    const newUser = await User.createUser(req.body);
     res.status(201).json(newUser);
   } catch (error) {
     next(error);
   }
 };
 
-export const updateUser = (req, res, next) => {
+export const updateUser = async (req, res, next) => {
   try {
-    const updated = User.updateUser(req.params.id, req.body);
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: 'Debe enviar al menos un campo para actualizar' });
+    }
+    const updated = await User.updateUser(req.params.id, req.body);
     if (!updated) return res.status(404).json({ message: 'Usuario no encontrado' });
     res.json(updated);
   } catch (error) {
@@ -51,9 +51,9 @@ export const updateUser = (req, res, next) => {
   }
 };
 
-export const deleteUser = (req, res, next) => {
+export const deleteUser = async (req, res, next) => {
   try {
-    const deleted = User.deleteUser(req.params.id);
+    const deleted = await User.deleteUser(req.params.id);
     if (!deleted) return res.status(404).json({ message: 'Usuario no encontrado' });
     res.status(204).send();
   } catch (error) {

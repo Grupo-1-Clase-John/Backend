@@ -49,55 +49,101 @@ export const getTasksByUser = async (userId, status) => {
   return tasks;
 };
 
-export const createTask = (data) => {
-  const tasks = readTasks();
-  const maxId = tasks.reduce((max, t) => {
-    const num = parseInt(t.id, 10);
-    return num > max ? num : max;
-  }, 0);
-  const newTask = {
-    ...data,
-    id: String(maxId + 1),
-    userIds: Array.isArray(data.userIds) ? [...new Set(data.userIds.map(String))] : [],
-    status: data.status || 'pendiente',
-    createdAt: new Date().toISOString()
-  };
-  tasks.push(newTask);
-  writeTasks(tasks);
-  return newTask;
+export const createTask = async (data) => {
+  const { title, description, status = 'pendiente', userIds } = data;
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const [taskResult] = await connection.execute(
+      'INSERT INTO tasks (title, description, status) VALUES (?, ?, ?)',
+      [title, description || null, status]
+    );
+    const taskId = taskResult.insertId;
+
+    const uniqueUserIds = [...new Set((userIds || []).map(String))];
+    for (const userId of uniqueUserIds) {
+      await connection.execute(
+        'INSERT INTO task_assignments (task_id, user_id) VALUES (?, ?)',
+        [taskId, userId]
+      );
+    }
+
+    await connection.commit();
+
+    return {
+      id: String(taskId),
+      title,
+      description: description || null,
+      status,
+      userIds: uniqueUserIds,
+      
+    };
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 };
 
-export const updateTask = (id, data) => {
-  const tasks = readTasks();
-  const index = tasks.findIndex(t => String(t.id) === String(id));
-  if (index === -1) return null;
+export const updateTask = async (id, data) => {
+  const { userIds, ...taskFields } = data;
+  const fields = [];
+  const values = [];
 
-  const wasCompleted = tasks[index].status === 'completada';
-  const newStatus = data.status;
-
-  tasks[index] = {
-    ...tasks[index],
-    ...data,
-    id: tasks[index].id,
-    userIds: Array.isArray(data.userIds) ? [...new Set(data.userIds.map(String))] : tasks[index].userIds,
-    updatedAt: new Date().toISOString()
-  };
-
-  if (newStatus === 'completada') {
-    tasks[index].completedAt = new Date().toISOString();
-  } else if (newStatus && wasCompleted) {
-    tasks[index].completedAt = null;
+  if (taskFields.title !== undefined) {
+    fields.push('title = ?');
+    values.push(taskFields.title);
+  }
+  if (taskFields.description !== undefined) {
+    fields.push('description = ?');
+    values.push(taskFields.description);
+  }
+  if (taskFields.status !== undefined) {
+    fields.push('status = ?');
+    values.push(taskFields.status);
   }
 
-  writeTasks(tasks);
-  return tasks[index];
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    let taskExists = true;
+
+    if (fields.length > 0) {
+      values.push(id);
+      const [result] = await connection.query(`UPDATE tasks SET ${fields.join(', ')} WHERE id = ?`, values);
+      if (result.affectedRows === 0) taskExists = false;
+    }
+
+    if (userIds !== undefined) {
+      await connection.query('DELETE FROM task_assignments WHERE task_id = ?', [id]);
+      if (userIds.length > 0) {
+        const insertValues = userIds.map(userId => [id, userId]);
+        await connection.query('INSERT INTO task_assignments (task_id, user_id) VALUES ?', [insertValues]);
+      }
+    }
+
+    await connection.commit();
+
+    if (!taskExists) return null;
+
+    return getTaskById(id);
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 };
 
-export const deleteTask = (id) => {
-  const tasks = readTasks();
-  const index = tasks.findIndex(t => String(t.id) === String(id));
-  if (index === -1) return false;
-  tasks.splice(index, 1);
-  writeTasks(tasks);
-  return true;
+export const deleteTask = async (id) => {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query('DELETE FROM tasks WHERE id = ?', [id]);
+    return result.affectedRows > 0;
+  } finally {
+    connection.release();
+  }
 };

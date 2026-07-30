@@ -30,7 +30,7 @@ export const createTask = async (req, res, next) => {
     }
     const error = await validateUserIds(userIds);
     if (error) return res.status(400).json({ message: error });
-    const newTask = Task.createTask(req.body);
+    const newTask = await Task.createTask(req.body);
     res.status(201).json(newTask);
   } catch (error) {
     next(error);
@@ -62,7 +62,7 @@ export const updateTask = async (req, res, next) => {
       if (error) return res.status(400).json({ message: error });
     }
 
-    const updated = Task.updateTask(req.params.id, req.body);
+    const updated = await Task.updateTask(req.params.id, req.body);
     if (!updated) return res.status(404).json({ message: 'Tarea no encontrada' });
     res.json(updated);
   } catch (error) {
@@ -80,9 +80,9 @@ export const getTaskById = async (req, res, next) => {
   }
 };
 
-export const deleteTask = (req, res, next) => {
+export const deleteTask = async (req, res, next) => {
   try {
-    const deleted = Task.deleteTask(req.params.id);
+    const deleted = await Task.deleteTask(req.params.id);
     if (!deleted) return res.status(404).json({ message: 'Tarea no encontrada' });
     res.status(204).send();
   } catch (error) {
