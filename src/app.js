@@ -3,7 +3,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { usersRoutes } from './routes/users.routes.js';
 import { tasksRoutes } from './routes/tasks.routes.js';
-
 dotenv.config();
 
 const app = express();
